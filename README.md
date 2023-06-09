@@ -10,3 +10,5 @@ Copyright (c) 2023 Arav K., Terts Diepraam, Jonathan Dönszelmann
 
 This crate uses the [MIT license][mit-license]; see the `LICENSE` file for the
 full text.
+
+[mit-license]: https://mit-license.org
