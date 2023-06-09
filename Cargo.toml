@@ -1,0 +1,18 @@
+[package]
+name = "bufferring"
+version = "0.0.0"
+authors = [
+    "Arav K. <243i8560cm0o379p@bal-e.org>",
+    "Terts Diepraam <terts.diepraam@gmail.com>",
+    "Jonathan Dönszelmann <jonabent@gmail.com>",
+]
+edition = "2021"
+rust-version = "1.69.0"
+description = "A flexible and performant crate for ring buffers."
+#documentation
+readme = "README.md"
+#homepage
+repository = "https://github.com/bal-e/bufferring"
+license = "MIT"
+keywords = ["ring-buffer", "no-std"]
+categories = ["data-structures"]
