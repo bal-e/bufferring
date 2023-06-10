@@ -1,12 +1,12 @@
 #![cfg(feature = "alloc")]
 
-use core::ptr::{self, NonNull};
 use core::num::NonZeroUsize;
+use core::ptr::{self, NonNull};
 
 use ::alloc::alloc::{self, Layout};
 
+use super::{PartialStorage, Storage};
 use crate::capacity::Capacity;
-use super::{Storage, PartialStorage};
 
 /// Ring buffer storage backed by dynamic allocation.
 pub struct AllocStorage<T, C: Capacity> {
@@ -20,10 +20,13 @@ impl<T, C: Capacity> AllocStorage<T, C> {
     /// Allocate storage for a ring buffer.
     pub fn new(capacity: C) -> Self {
         let raw_capacity = NonZeroUsize::get(capacity.into());
-        let layout = Layout::array::<T>(raw_capacity)
-            .expect("Layout calculation failed due to overflow");
+        let layout =
+            Layout::array::<T>(raw_capacity).expect("Layout calculation failed due to overflow");
         if layout.size() == 0 {
-            return Self { pointer: NonNull::dangling(), capacity };
+            return Self {
+                pointer: NonNull::dangling(),
+                capacity,
+            };
         }
 
         // SAFETY: We confirmed above that 'layout' has a non-zero size.
