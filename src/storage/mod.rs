@@ -1,5 +1,8 @@
 use crate::capacity::Capacity;
 
+mod array;
+pub use array::ArrayStorage;
+
 mod impls;
 
 /// A generic backing storage for ring buffers.

@@ -3,7 +3,7 @@ use core::fmt;
 use core::num::NonZeroUsize;
 
 /// The capacity of a ring buffer.
-pub trait Capacity: Into<NonZeroUsize> + TryFrom<usize> + Sized {
+pub trait Capacity: Into<NonZeroUsize> + TryFrom<usize> + Copy + Sized {
     /// Construct a new capacity from a compile-time value.
     ///
     /// If the given value is invalid, a compile-time error will occur.
