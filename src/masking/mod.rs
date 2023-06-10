@@ -1,8 +1,7 @@
-use core::mem::MaybeUninit;
 use core::num::NonZeroUsize;
 
 use crate::capacity::MaskingCapacity;
-use crate::storage::{PartialStorage, Storage};
+use crate::storage::PartialStorage;
 
 mod tests;
 
@@ -12,25 +11,25 @@ pub struct MaskingRingBuffer<S: PartialStorage<Capacity = MaskingCapacity>> {
     /// The number of items in the buffer (`0..=CAPACITY`)
     len: usize,
     /// The underlying storage
-    storage: MaybeUninit<S>,
+    storage: S,
 }
 
 impl<S: PartialStorage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
     pub fn new(storage: S) -> Self {
         MaskingRingBuffer {
-            storage: MaybeUninit::new(storage),
             index: 0,
             len: 0,
+            storage,
         }
     }
 
     /// Returns whether the ringbuffer is full
     ///
-    /// A ringbuffer is full when its length equals its capacity. If an item is enqueued
-    /// while the ringbuffer is full [MaskingRingBuffer::enqueue] will dequeue an item to
-    /// make room for the new item. The dequeued item will be returned.
+    /// A ringbuffer is full when its length equals its capacity. If an item is enqueued while the
+    /// ringbuffer is full [MaskingRingBuffer::enqueue] will dequeue an item to make room for the
+    /// new item. The dequeued item will be returned.
     pub fn is_full(&self) -> bool {
-        self.len == self.capacity().get()
+        self.len == self.capacity()
     }
 
     /// Returns true when the ringbuffer is empty
@@ -41,30 +40,32 @@ impl<S: PartialStorage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
     /// The capacity of the underlying storage
     ///
     /// This is the maximum number of items that the ringbuffer can hold.
-    pub fn capacity(&self) -> NonZeroUsize {
-        unsafe { Storage::capacity(self.storage.as_ptr()) }.into()
+    pub fn capacity(&self) -> usize {
+        NonZeroUsize::from(self.storage.capacity()).get()
     }
 
     /// Add an element to the end of the ringbuffer
     ///
-    /// If the ringbuffer is full, the first-in element will be removed from the buffer and returned.
+    /// If the ringbuffer is full, the first-in element will be removed from the buffer and
+    /// returned.
     pub fn enqueue(&mut self, item: S::Item) -> Option<S::Item> {
-        // We need to dequeue if the buffer is full, in which case we return dequeued item
-        let dequeued_item = self.is_full().then(|| self.dequeue()).flatten();
-
-        // Find the offset to put the new item on
-        let mask = unsafe { Storage::capacity(self.storage.as_ptr()) }.mask();
+        let mask = self.storage.capacity().mask();
         let offset = mask & (self.index + self.len);
+        let buffer = self.storage.get_ptr_mut();
 
-        // Write the item into the storage at offset
-        // TODO: This could be a provided method on PartialStorage
-        let buffer = unsafe { PartialStorage::raw_ptr_mut(self.storage.as_mut_ptr()) };
-        let ptr = unsafe { (buffer as *mut S::Item).add(offset) };
-        unsafe { *ptr = item };
+        // SAFETY: Because the offset is masked, it is within the capacity and hence within the
+        // storage. We also know that buffer is a valid pointer, because it comes from a valid
+        // PartialStorage.
+        let ptr = unsafe { buffer.cast::<S::Item>().add(offset) };
 
-        self.len += 1;
-
-        dequeued_item
+        if self.is_full() {
+            self.index = mask & (self.index + 1);
+            Some(unsafe { ptr.replace(item) })
+        } else {
+            unsafe { *ptr = item };
+            self.len += 1;
+            None
+        }
     }
 
     /// Remove an element from the start of the ringbuffer
@@ -74,11 +75,10 @@ impl<S: PartialStorage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
         }
 
         // Get the item from the buffer
-        let buffer = unsafe { PartialStorage::raw_ptr_mut(self.storage.as_mut_ptr()) };
-        let ptr = unsafe { (buffer as *mut MaybeUninit<S::Item>).add(self.index) };
-        let item = unsafe { core::ptr::replace(ptr, MaybeUninit::uninit()).assume_init() };
+        let buffer = self.storage.get_ptr_mut();
+        let item = unsafe { buffer.cast::<S::Item>().add(self.index).read() };
 
-        let mask = unsafe { Storage::capacity(self.storage.as_ptr()) }.mask();
+        let mask = self.storage.capacity().mask();
         self.index = mask & (self.index + 1);
         self.len -= 1;
 
