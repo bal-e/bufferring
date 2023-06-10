@@ -35,13 +35,13 @@ unsafe impl<T, C: Capacity, const N: usize> PartialStorage for ArrayStorage<T, C
     unsafe fn raw_ptr(this: *const Self) -> *const [Self::Item] {
         // SAFETY: Only the elements of 'this' can be uninitialized, but that's
         // all wrapped in 'MaybeUninit', so we can cast to a regular reference.
-        (&*this).inner.as_ptr()
+        (*this).inner.as_ptr()
     }
 
     unsafe fn raw_ptr_mut(this: *mut Self) -> *mut [Self::Item] {
         // SAFETY: Only the elements of 'this' can be uninitialized, but that's
         // all wrapped in 'MaybeUninit', so we can cast to a regular reference.
-        (&mut *this).inner.as_mut_ptr()
+        (*this).inner.as_mut_ptr()
     }
 }
 

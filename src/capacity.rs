@@ -38,6 +38,7 @@ impl Capacity for NonZeroCapacity {
             const IS_VALID: () = assert!(N != 0, "The given capacity value must be non-zero!");
         }
 
+        #[allow(clippy::let_unit_value)]
         let () = Check::<N>::IS_VALID;
         // SAFETY: We just asserted that 'N' is non-zero.
         unsafe { Self::new_unchecked(N) }
@@ -116,6 +117,7 @@ impl Capacity for PowerOfTwoCapacity {
             );
         }
 
+        #[allow(clippy::let_unit_value)]
         let () = Check::<N>::IS_VALID;
         // SAFETY: We just asserted that 'N' is a power of two.
         unsafe { Self::new_unchecked(N) }
@@ -194,6 +196,7 @@ impl Capacity for MaskingCapacity {
             );
         }
 
+        #[allow(clippy::let_unit_value)]
         let () = Check::<N>::IS_VALID;
         // SAFETY: We just asserted that 'N' is a power of two.
         unsafe { Self::new_unchecked(N) }
