@@ -1,3 +1,9 @@
+use core::mem::MaybeUninit;
+use core::num::NonZeroUsize;
+
+use crate::capacity::MaskingCapacity;
+use crate::storage::{PartialStorage, Storage};
+
 mod tests;
 
 pub struct MaskingRingBuffer<S: PartialStorage<Capacity = MaskingCapacity>> {
@@ -68,9 +74,8 @@ impl<S: PartialStorage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
         }
 
         // Get the item from the buffer
-        let offset = self.index.0;
         let buffer = unsafe { PartialStorage::raw_ptr_mut(self.storage.as_mut_ptr()) };
-        let ptr = unsafe { (buffer as *mut MaybeUninit<S::Item>).add(offset) };
+        let ptr = unsafe { (buffer as *mut MaybeUninit<S::Item>).add(self.index) };
         let item = unsafe { core::ptr::replace(ptr, MaybeUninit::uninit()).assume_init() };
 
         let mask = unsafe { Storage::capacity(self.storage.as_ptr()) }.mask();
