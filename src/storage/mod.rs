@@ -1,5 +1,9 @@
 use crate::capacity::Capacity;
 
+mod alloc;
+#[cfg(feature = "alloc")]
+pub use self::alloc::AllocStorage;
+
 mod array;
 pub use array::ArrayStorage;
 

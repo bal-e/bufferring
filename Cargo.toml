@@ -16,3 +16,7 @@ repository = "https://github.com/bal-e/bufferring"
 license = "MIT"
 keywords = ["ring-buffer", "no-std"]
 categories = ["data-structures"]
+
+[features]
+default = ["alloc"]
+alloc = []
