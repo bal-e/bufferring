@@ -26,7 +26,7 @@ unsafe impl<T, C: Capacity, const N: usize> Storage for ArrayStorage<T, C, N> {
     type Item = T;
     type Capacity = C;
 
-    unsafe fn capacity(_: *const Self) -> Self::Capacity {
+    fn capacity(&self) -> Self::Capacity {
         C::from_ct::<N>()
     }
 }

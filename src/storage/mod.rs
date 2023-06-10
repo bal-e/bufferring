@@ -14,7 +14,7 @@ pub unsafe trait Storage {
     type Capacity: Capacity;
 
     /// Get the capacity for this storage.
-    unsafe fn capacity(this: *const Self) -> Self::Capacity;
+    fn capacity(&self) -> Self::Capacity;
 }
 
 /// Ring buffer storage that permits uninitialized elements.

@@ -4,11 +4,8 @@ unsafe impl<T: Storage> Storage for &mut T {
     type Item = T::Item;
     type Capacity = T::Capacity;
 
-    unsafe fn capacity(this: *const Self) -> Self::Capacity {
-        // SAFETY: The caller guarantees that only the exposed elements can be
-        // uninitialized; this does not include the mutable reference itself, so
-        // we can read from it.
-        T::capacity(*(this as *const *const T))
+    fn capacity(&self) -> Self::Capacity {
+        T::capacity(*self)
     }
 }
 
