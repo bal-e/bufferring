@@ -5,7 +5,7 @@ use core::ptr::{self, NonNull};
 
 use ::alloc::alloc::{self, Layout};
 
-use super::{PartialStorage, Storage};
+use super::Storage;
 use crate::capacity::Capacity;
 
 /// Ring buffer storage backed by dynamic allocation.
@@ -45,9 +45,7 @@ unsafe impl<T, C: Capacity> Storage for AllocStorage<T, C> {
     fn capacity(&self) -> Self::Capacity {
         self.capacity
     }
-}
 
-unsafe impl<T, C: Capacity> PartialStorage for AllocStorage<T, C> {
     fn get_ptr(&self) -> *const [Self::Item] {
         let raw_capacity = NonZeroUsize::get(self.capacity.into());
         ptr::slice_from_raw_parts(self.pointer.as_ptr(), raw_capacity)

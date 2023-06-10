@@ -1,12 +1,10 @@
 #![cfg(test)]
 
-use crate::storage::ArrayStorage;
-
-use super::MaskingRingBuffer;
+use crate::masking::MaskingArrayRingBuffer;
 
 #[test]
 fn enqueue_and_dequeue_once() {
-    let mut buf = MaskingRingBuffer::new(ArrayStorage::<_, _, 4>::default());
+    let mut buf = MaskingArrayRingBuffer::<_, 4>::default();
     buf.enqueue(1);
     assert_eq!(buf.dequeue(), Some(1));
     assert_eq!(buf.dequeue(), None);
@@ -14,7 +12,7 @@ fn enqueue_and_dequeue_once() {
 
 #[test]
 fn fill_buffer_up_before_dequeue() {
-    let mut buf = MaskingRingBuffer::new(ArrayStorage::<_, _, 4>::default());
+    let mut buf = MaskingArrayRingBuffer::<_, 4>::default();
 
     assert_eq!(None, buf.enqueue(1));
     assert_eq!(None, buf.enqueue(2));
@@ -33,7 +31,7 @@ fn fill_buffer_up_before_dequeue() {
 
 #[test]
 fn wrap_many_times() {
-    let mut buf = MaskingRingBuffer::new(ArrayStorage::<_, _, 4>::default());
+    let mut buf = MaskingArrayRingBuffer::<_, 4>::default();
 
     let mut total = 0;
     for i in 1..=40 {
