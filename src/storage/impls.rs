@@ -1,4 +1,4 @@
-use super::{Storage, PartialStorage, IndirectPartialStorage, FullStorage};
+use super::{FullStorage, IndirectPartialStorage, PartialStorage, Storage};
 
 unsafe impl<T: Storage> Storage for &mut T {
     type Item = T::Item;

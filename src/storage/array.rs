@@ -1,8 +1,8 @@
 use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 
+use super::{IndirectPartialStorage, PartialStorage, Storage};
 use crate::capacity::Capacity;
-use super::{Storage, PartialStorage, IndirectPartialStorage};
 
 /// Ring buffer storage backed by a fixed-size array.
 pub struct ArrayStorage<T, C: Capacity, const N: usize> {

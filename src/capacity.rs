@@ -23,16 +23,19 @@ impl NonZeroCapacity {
     /// behaviour will occur.
     pub unsafe fn new_unchecked(value: usize) -> Self {
         // SAFETY: The caller checks for us that the value is non-zero.
-        Self { inner: NonZeroUsize::new_unchecked(value) }
+        Self {
+            inner: NonZeroUsize::new_unchecked(value),
+        }
     }
 }
 
 impl Capacity for NonZeroCapacity {
     fn from_ct<const N: usize>() -> Self {
-        struct Check<const N: usize> { _phd: [(); N] }
+        struct Check<const N: usize> {
+            _phd: [(); N],
+        }
         impl<const N: usize> Check<N> {
-            const IS_VALID: () = assert!(N != 0,
-                "The given capacity value must be non-zero!");
+            const IS_VALID: () = assert!(N != 0, "The given capacity value must be non-zero!");
         }
 
         let () = Check::<N>::IS_VALID;
@@ -95,16 +98,22 @@ impl PowerOfTwoCapacity {
     /// undefined behaviour will occur.
     pub unsafe fn new_unchecked(value: usize) -> Self {
         // SAFETY: The caller checks for us that the value is a power of two.
-        Self { inner: NonZeroUsize::new_unchecked(value) }
+        Self {
+            inner: NonZeroUsize::new_unchecked(value),
+        }
     }
 }
 
 impl Capacity for PowerOfTwoCapacity {
     fn from_ct<const N: usize>() -> Self {
-        struct Check<const N: usize> { _phd: [(); N] }
+        struct Check<const N: usize> {
+            _phd: [(); N],
+        }
         impl<const N: usize> Check<N> {
-            const IS_VALID: () = assert!(N.is_power_of_two(),
-                "The given capacity value must be a power of two!");
+            const IS_VALID: () = assert!(
+                N.is_power_of_two(),
+                "The given capacity value must be a power of two!"
+            );
         }
 
         let () = Check::<N>::IS_VALID;
@@ -175,10 +184,14 @@ impl MaskingCapacity {
 
 impl Capacity for MaskingCapacity {
     fn from_ct<const N: usize>() -> Self {
-        struct Check<const N: usize> { _phd: [(); N] }
+        struct Check<const N: usize> {
+            _phd: [(); N],
+        }
         impl<const N: usize> Check<N> {
-            const IS_VALID: () = assert!(N.is_power_of_two(),
-                "The given capacity value must be a power of two!");
+            const IS_VALID: () = assert!(
+                N.is_power_of_two(),
+                "The given capacity value must be a power of two!"
+            );
         }
 
         let () = Check::<N>::IS_VALID;
