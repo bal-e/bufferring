@@ -1,11 +1,14 @@
 use core::num::NonZeroUsize;
 
 use crate::capacity::MaskingCapacity;
-use crate::storage::PartialStorage;
+use crate::storage::{ArrayStorage, Storage};
 
 mod tests;
 
-pub struct MaskingRingBuffer<S: PartialStorage<Capacity = MaskingCapacity>> {
+pub type MaskingArrayRingBuffer<T, const N: usize> =
+    MaskingRingBuffer<ArrayStorage<T, MaskingCapacity, N>>;
+
+pub struct MaskingRingBuffer<S: Storage<Capacity = MaskingCapacity>> {
     /// The start of the buffer in the storage (`0..CAPACITY`)
     index: usize,
     /// The number of items in the buffer (`0..=CAPACITY`)
@@ -14,8 +17,8 @@ pub struct MaskingRingBuffer<S: PartialStorage<Capacity = MaskingCapacity>> {
     storage: S,
 }
 
-impl<S: PartialStorage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
-    pub fn new(storage: S) -> Self {
+impl<S: Storage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
+    pub fn from_empty(storage: S) -> Self {
         MaskingRingBuffer {
             index: 0,
             len: 0,
@@ -83,5 +86,15 @@ impl<S: PartialStorage<Capacity = MaskingCapacity>> MaskingRingBuffer<S> {
         self.len -= 1;
 
         Some(item)
+    }
+}
+
+impl<S: Storage<Capacity = MaskingCapacity> + Default> Default for MaskingRingBuffer<S> {
+    fn default() -> Self {
+        MaskingRingBuffer {
+            index: 0,
+            len: 0,
+            storage: S::default(),
+        }
     }
 }

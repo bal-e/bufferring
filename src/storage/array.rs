@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 
-use super::{PartialStorage, Storage};
+use super::Storage;
 use crate::capacity::Capacity;
 
 /// Ring buffer storage backed by a fixed-size array.
@@ -29,9 +29,7 @@ unsafe impl<T, C: Capacity, const N: usize> Storage for ArrayStorage<T, C, N> {
     fn capacity(&self) -> Self::Capacity {
         C::from_ct::<N>()
     }
-}
 
-unsafe impl<T, C: Capacity, const N: usize> PartialStorage for ArrayStorage<T, C, N> {
     fn get_ptr(&self) -> *const [Self::Item] {
         self.inner.as_ptr()
     }
