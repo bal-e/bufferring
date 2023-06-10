@@ -1,7 +1,7 @@
 use core::marker::PhantomData;
 use core::mem::MaybeUninit;
 
-use super::{IndirectPartialStorage, PartialStorage, Storage};
+use super::{PartialStorage, Storage};
 use crate::capacity::Capacity;
 
 /// Ring buffer storage backed by a fixed-size array.
@@ -32,20 +32,6 @@ unsafe impl<T, C: Capacity, const N: usize> Storage for ArrayStorage<T, C, N> {
 }
 
 unsafe impl<T, C: Capacity, const N: usize> PartialStorage for ArrayStorage<T, C, N> {
-    unsafe fn raw_ptr(this: *const Self) -> *const [Self::Item] {
-        // SAFETY: Only the elements of 'this' can be uninitialized, but that's
-        // all wrapped in 'MaybeUninit', so we can cast to a regular reference.
-        (*this).inner.as_ptr()
-    }
-
-    unsafe fn raw_ptr_mut(this: *mut Self) -> *mut [Self::Item] {
-        // SAFETY: Only the elements of 'this' can be uninitialized, but that's
-        // all wrapped in 'MaybeUninit', so we can cast to a regular reference.
-        (*this).inner.as_mut_ptr()
-    }
-}
-
-unsafe impl<T, C: Capacity, const N: usize> IndirectPartialStorage for ArrayStorage<T, C, N> {
     fn get_ptr(&self) -> *const [Self::Item] {
         self.inner.as_ptr()
     }

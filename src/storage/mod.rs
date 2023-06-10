@@ -19,15 +19,6 @@ pub unsafe trait Storage {
 
 /// Ring buffer storage that permits uninitialized elements.
 pub unsafe trait PartialStorage: Storage {
-    /// Get a `const` pointer to the stored elements.
-    unsafe fn raw_ptr(this: *const Self) -> *const [Self::Item];
-
-    /// Get a `mut` pointer to the stored elements.
-    unsafe fn raw_ptr_mut(this: *mut Self) -> *mut [Self::Item];
-}
-
-/// Indirect ring buffer storage that permits uninitialized elements.
-pub unsafe trait IndirectPartialStorage: PartialStorage {
     /// Get a `const` pointer to the stored elements safely.
     fn get_ptr(&self) -> *const [Self::Item];
 
