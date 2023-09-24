@@ -16,7 +16,9 @@ pub type SubtractingArrayRingBuffer<T, const N: usize> =
 /// to the same effect.  [`SubtractingRingBuffer`] supports capacity sizes that are not powers of
 /// two.
 pub struct SubtractingRingBuffer<S>
-where S: ?Sized + Storage<Capacity = NonZeroCapacity> {
+where
+    S: ?Sized + Storage<Capacity = NonZeroCapacity>,
+{
     /// The offset of the items in storage.
     ///
     /// The items begin at this offset (in units of elements), possibly looping around.  Its value
@@ -34,7 +36,9 @@ where S: ?Sized + Storage<Capacity = NonZeroCapacity> {
 }
 
 impl<S> SubtractingRingBuffer<S>
-where S: ?Sized + Storage<Capacity = NonZeroCapacity> {
+where
+    S: ?Sized + Storage<Capacity = NonZeroCapacity>,
+{
     /// Whether the ring buffer is full.
     ///
     /// The ring buffer is considered full if it has as many elements as its [`capacity()`].  At
@@ -93,7 +97,11 @@ where S: ?Sized + Storage<Capacity = NonZeroCapacity> {
         };
 
         if len == cap {
-            self.off = if off + 1 == cap { off + 1 - cap } else { off + 1 };
+            self.off = if off + 1 == cap {
+                off + 1 - cap
+            } else {
+                off + 1
+            };
             Some(unsafe { ptr.replace(item) })
         } else {
             unsafe { ptr.write(item) };
@@ -116,7 +124,9 @@ where S: ?Sized + Storage<Capacity = NonZeroCapacity> {
     pub fn dequeue(&mut self) -> Option<S::Item> {
         let (off, len, cap) = (self.off, self.len, self.capacity());
 
-        if len == 0 { return None; }
+        if len == 0 {
+            return None;
+        }
 
         // A pointer to the slot for the old element.
         let ptr = unsafe {
@@ -124,14 +134,20 @@ where S: ?Sized + Storage<Capacity = NonZeroCapacity> {
             self.storage.get_ptr_mut().cast::<S::Item>().add(off)
         };
 
-        self.off = if off + 1 == cap { off + 1 - cap } else { off + 1 };
+        self.off = if off + 1 == cap {
+            off + 1 - cap
+        } else {
+            off + 1
+        };
         self.len -= 1;
         Some(unsafe { ptr.read() })
     }
 }
 
 impl<S> SubtractingRingBuffer<S>
-where S: Storage<Capacity = NonZeroCapacity> {
+where
+    S: Storage<Capacity = NonZeroCapacity>,
+{
     /// Construct a new [`SubtractingRingBuffer`] with the given storage.
     ///
     /// The resulting buffer is empty - elements can be filled in afterwards.  Any data in the
@@ -146,7 +162,9 @@ where S: Storage<Capacity = NonZeroCapacity> {
 }
 
 impl<S> Default for SubtractingRingBuffer<S>
-where S: Default + Storage<Capacity = NonZeroCapacity> {
+where
+    S: Default + Storage<Capacity = NonZeroCapacity>,
+{
     fn default() -> Self {
         Self {
             off: 0,

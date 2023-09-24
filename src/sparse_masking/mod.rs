@@ -16,7 +16,9 @@ pub type SparseMaskingArrayRingBuffer<T, const N: usize> =
 /// non-power-of-two ring buffer sizes with masking by always leaving empty space in a power-of-two
 /// masking buffer.
 pub struct SparseMaskingRingBuffer<S>
-where S: ?Sized + Storage<Capacity = MaskingCapacity> {
+where
+    S: ?Sized + Storage<Capacity = MaskingCapacity>,
+{
     /// The offset of the items in storage.
     ///
     /// The items begin at this offset (in units of elements), possibly looping around.  Its value
@@ -40,7 +42,9 @@ where S: ?Sized + Storage<Capacity = MaskingCapacity> {
 }
 
 impl<S> SparseMaskingRingBuffer<S>
-where S: ?Sized + Storage<Capacity = MaskingCapacity> {
+where
+    S: ?Sized + Storage<Capacity = MaskingCapacity>,
+{
     /// Whether the ring buffer is full.
     ///
     /// The ring buffer is considered full if it has as many elements as its [`capacity()`].  At
@@ -112,7 +116,9 @@ where S: ?Sized + Storage<Capacity = MaskingCapacity> {
         let (off, len) = (self.off, self.len);
         let mask = self.storage.capacity().mask();
 
-        if len == 0 { return None; }
+        if len == 0 {
+            return None;
+        }
 
         // A pointer to the slot for the old element.
         let ptr = unsafe {
@@ -127,7 +133,9 @@ where S: ?Sized + Storage<Capacity = MaskingCapacity> {
 }
 
 impl<S> SparseMaskingRingBuffer<S>
-where S: Storage<Capacity = MaskingCapacity> {
+where
+    S: Storage<Capacity = MaskingCapacity>,
+{
     /// Construct a new [`SparseMaskingRingBuffer`] with the given storage and capacity.
     ///
     /// The specified capacity must be less than or equal to the capacity of the storage.  The
@@ -137,10 +145,7 @@ where S: Storage<Capacity = MaskingCapacity> {
     /// # Panics
     ///
     /// This function will panic if the given capacity is greater than the storage capacity.
-    pub fn with_storage(
-        capacity: NonZeroCapacity,
-        storage: S,
-    ) -> Self {
+    pub fn with_storage(capacity: NonZeroCapacity, storage: S) -> Self {
         let artificial_capacity = NonZeroUsize::from(capacity);
         let storage_capacity = NonZeroUsize::from(storage.capacity());
         assert!(artificial_capacity <= storage_capacity);
